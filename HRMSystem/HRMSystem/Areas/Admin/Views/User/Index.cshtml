@@ -1,0 +1,99 @@
+﻿@model PagedList.IPagedList<Model.EF.User>
+@using PagedList.Mvc;
+
+@{
+    ViewBag.Title = "Quản lý người dùng";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+@section header{
+    Quản lý người dùng
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Danh sách người dùng</h3>
+            </div>
+            <div class="card-body">
+                @using (Html.BeginForm("Index", "User", FormMethod.Get))
+                {
+                    <div class="row">
+                        <div class="col-lg-3">
+                            <div class="input-group input-group-sm">
+                                <input class="form-control form-control-navbar" 
+                                       type="search" 
+                                       value="@ViewBag.SearchString" 
+                                       placeholder="Tìm kiếm..." 
+                                       aria-label="Search..." 
+                                       name="searchString" />
+                                <div class="input-group-append">
+                                    <button type="submit" class="btn btn-navbar btn-primary text-dark">
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+                <div class="table-responsive">
+                    <table id="example2" class="table table-bordered table-striped table-condensed table-hover">
+                        <thead>
+                            <tr>
+                                <th>Mã nhân viên</th>
+                                <th>Tên nhân viên</th>
+                                <th>Tài khoản</th>
+                                <th>Trạng thái</th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr id="row_@item.ID">
+
+                                    <td>@item.BusinessPartner_ID</td>
+                                    <td>@item.FullName</td>
+                                    <td>@item.UserName</td>
+                                    <td>
+                                        <a href="/Admin/User/Edit/@item.ID">Sửa</a>
+                                        |
+                                        @*<a href="/Admin/User/Delete/@item.ID">Xóa</a>*@
+                                        @Ajax.ActionLink("Xóa", "Delete", new { @id = item.ID }, new AjaxOptions
+                                   {
+                                       Confirm = "Bạn có muốn xóa bản ghi này?",
+                                       OnComplete = "$('#row_" + @item.ID + "').remove()",
+                                       HttpMethod = "Delete"
+                                   })
+
+                                    </td>
+                                </tr>
+                            }
+
+                        </tbody>
+                        @*<tfoot>
+                                <tr>
+                                    <th>Mã nhân viên</th>
+                                    <th>Tên nhân viên</th>
+                                    <th>Tài khoản</th>
+                                    <th>Trạng thái</th>
+                                </tr>
+                            </tfoot>*@
+                    </table>
+                    <div class="row">
+                        <div class="col-md-11">
+                            Trang @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) / @Model.PageCount
+                        </div>
+                        <div class="col-md-offset-11 col-md-1 ">
+                            @Html.PagedListPager(Model, pageNumber => Url.Action("Index", new { pageNumber, @searchString = @ViewBag.SearchString }))
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
